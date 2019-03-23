@@ -1,22 +1,26 @@
 import java.util.Arrays;
 
-public class NeuralNetwork {
+ class NeuralNetwork {
     private int nodesNumber, layersNumber;
     private double[][] weights,biases;
     private Data data;
 
-    public NeuralNetwork(int layersNumber, int nodesNumber, Data data) {
+     NeuralNetwork(int layersNumber, int nodesNumber, Data data) {
         this.setLayersNumber(layersNumber);
         this.setNodesNumber(nodesNumber);
         this.data   = data;
-        weights     = np.random(getLayersNumber(),getNodesNumber());
-        biases      = new double[getLayersNumber()][getNodesNumber()];
+        weights     = np.random(getLayersNumber(),data.getPatientData()[0].length);
+        biases      = new double[getLayersNumber()][data.getPatientData().length];
 
     }
 
-    public void learn(int iterations){
+     void learn(int iterations){
         if(data==null) {
             throw new EmptyDataException("No data given to the NN");
+        }
+        else {
+            data.setPatientData(np.T(data.getPatientData()));
+            data.setPatientDiagnoses(np.T(data.getPatientDiagnoses()));
         }
         double alfa=  0.01;
         for(int i=0;i<iterations;i++) {
@@ -31,8 +35,8 @@ public class NeuralNetwork {
             double[][] dBiases  = np.divide(dResults,getLayersNumber());
 
             //Gradient descent
-            weights =np.subtract(weights,np.multiply(alfa, dWeights));
-            biases  =np.subtract(biases,np.multiply(alfa,dBiases));
+            weights = np.subtract(weights,np.multiply(alfa, dWeights));
+            biases  = np.subtract(biases,np.multiply(alfa,dBiases));
             if(i%(iterations/10)==0){
                 System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~");
                 System.out.println("Cost = "+cost);

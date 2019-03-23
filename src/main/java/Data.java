@@ -51,7 +51,15 @@ import java.util.ArrayList;
         return patientDiagnoses;
     }
 
-    void print(){
+    void setPatientData(double[][] patientData) {
+         this.patientData = patientData;
+     }
+
+     void setPatientDiagnoses(double[][] patientDiagnoses) {
+         this.patientDiagnoses = patientDiagnoses;
+     }
+
+     void print(){
         System.out.printf("%20s\t%20s\t%20s\t%20s\t%20s\t%20s\t%20s\t%20s\n","Temperature of patient","Occurrence of nausea","Lumbar pain","Urine pushing","Micturition pains","Burning of urethra","dec: Inflammation","dec: Nephritis");
         for(int i=0;i<patientData.length;i++) {
             for (int j = 0; j < patientData[i].length; j++)
