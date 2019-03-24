@@ -118,6 +118,7 @@ class NeuralNetwork {
             //Forward Propagation
             double[][] Results          = np.add(np.dot(weights, patientData), biases);
             double[][] ActivationFunc   = np.sigmoid(Results);
+            System.out.println("Dimensions: "+patientDiagnosis.length+"x"+patientDiagnosis[0].length+"  activ "+ActivationFunc.length+"x"+ActivationFunc[0].length);
             double cost                 = np.cross_entropy(m, patientDiagnosis, ActivationFunc);
 
             //Back Propagation
