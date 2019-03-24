@@ -2,13 +2,21 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
- class Data {
+class Data {
     private double[][] patientData;
     private double[][] patientDiagnoses;
+    private int numberOfRecords;
 
     Data(URL filePath) {
         dataAcquisition(filePath);
+    }
+
+    Data(int numberOfRecords,int numberOfParameters,int numberOfDiagnoses) {
+        setNumberOfRecords(numberOfRecords);
+        this.patientData        = new double[numberOfRecords][numberOfParameters];
+        this.patientDiagnoses   = new double[numberOfRecords][numberOfDiagnoses];
     }
 
     private void dataAcquisition(URL filePath) {
@@ -20,6 +28,7 @@ import java.util.ArrayList;
             while((line=br.readLine())!=null){
                 buffor.add(line.split(";"));
             }
+            setNumberOfRecords(buffor.size());
             patientData=new double[buffor.size()][buffor.get(0).length-2];
             patientDiagnoses=new double[buffor.size()][2];
             for(int i=0;i<buffor.size();i++){
@@ -42,6 +51,17 @@ import java.util.ArrayList;
         else throw new DataReadingException("Not able to find right value for data:\""+str+"\"");
     }
 
+    void appendData(double[] newPatientData,double[] newPatientDiagnosis)
+    {
+        ArrayList<double[]> temp1=new ArrayList<>(Arrays.asList(this.getPatientData()));
+        ArrayList<double[]> temp2=new ArrayList<>(Arrays.asList(this.getPatientDiagnoses()));
+        temp1.add(newPatientData);
+        temp2.add(newPatientDiagnosis);
+        this.setPatientDiagnoses((double[][]) temp1.toArray());
+        this.setPatientData((double[][]) temp2.toArray());
+    }
+
+
     double[][] getPatientData() {
         return patientData;
     }
@@ -51,11 +71,11 @@ import java.util.ArrayList;
         return patientDiagnoses;
     }
 
-    void setPatientData(double[][] patientData) {
+    private void setPatientData(double[][] patientData) {
          this.patientData = patientData;
      }
 
-     void setPatientDiagnoses(double[][] patientDiagnoses) {
+    private void setPatientDiagnoses(double[][] patientDiagnoses) {
          this.patientDiagnoses = patientDiagnoses;
      }
 
@@ -74,4 +94,11 @@ import java.util.ArrayList;
             super(s);
         }
     }
-}
+
+    int getNumberOfRecords() {
+         return numberOfRecords;
+     }
+     void setNumberOfRecords(int numberOfRecords) {
+         this.numberOfRecords = numberOfRecords;
+     }
+ }

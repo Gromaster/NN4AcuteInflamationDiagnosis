@@ -1,6 +1,7 @@
 import java.util.Arrays;
+import java.util.Random;
 
- class NeuralNetwork {
+class NeuralNetwork {
     private int nodesNumber, layersNumber;
     private double[][] weights,biases;
     private Data data;
@@ -14,24 +15,61 @@ import java.util.Arrays;
 
     }
 
-     void learn(int iterations){
-        if(data==null) {
+    void runTnTby2cv(int numberOfRepeats){
+        for(int i=0;i<numberOfRepeats;i++){
+            Data learnData  = new Data(data.getNumberOfRecords()/2,data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
+            Data testData   = new Data(data.getNumberOfRecords()/2,data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
+            try {
+                divideDataSet(learnData,testData);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            for(int learnSetIterations=1000;learnSetIterations<5000;learnSetIterations+=1000){
+                learn(learnData.getPatientData(),learnData.getPatientDiagnoses(),learnSetIterations);
+                test(testData.getPatientData(),testData.getPatientDiagnoses());
+            }
+
+
+
+        }
+    }
+
+    private void test(double[][] patientData, double[][] patientDiagnoses) {
+
+    }
+
+    private void divideDataSet(Data learnData,Data testData) throws Exception {
+         Random r=new Random();
+         for(int i=0;i<data.getNumberOfRecords();i++){
+             if(r.nextBoolean()&&(learnData.getNumberOfRecords()<(data.getNumberOfRecords()/2)))
+                 learnData.appendData(data.getPatientData()[i],data.getPatientDiagnoses()[i]);
+             else if(testData.getNumberOfRecords()<(data.getNumberOfRecords()/2))
+                 testData.appendData(data.getPatientData()[i],data.getPatientDiagnoses()[i]);
+             else
+                 learnData.appendData(data.getPatientData()[i],data.getPatientDiagnoses()[i]);
+         }
+         if(learnData.getNumberOfRecords()!=testData.getNumberOfRecords())throw new Exception("Different sizes of learn and test data");
+     }
+
+
+    private void learn(double[][] patientData,double[][]patientDiagnosis,int iterations){
+        if(patientData==null || patientDiagnosis==null) {
             throw new EmptyDataException("No data given to the NN");
         }
         else {
-            data.setPatientData(np.T(data.getPatientData()));
-            data.setPatientDiagnoses(np.T(data.getPatientDiagnoses()));
+            patientData         = np.T(patientData);
+            patientDiagnosis    = np.T(patientDiagnosis);
         }
         double alfa=  0.01;
         for(int i=0;i<iterations;i++) {
             //Forward Propagation
-            double[][] Results          = np.add(np.dot(weights, data.getPatientData()), biases);
+            double[][] Results          = np.add(np.dot(weights, patientData), biases);
             double[][] ActivationFunc   = np.sigmoid(Results);
-            double cost                 = np.cross_entropy(getLayersNumber(), data.getPatientDiagnoses(), ActivationFunc);
+            double cost                 = np.cross_entropy(getLayersNumber(), patientDiagnosis, ActivationFunc);
 
             //Back Propagation
-            double[][] dResults = np.subtract(ActivationFunc,data.getPatientDiagnoses());
-            double[][] dWeights = np.divide(np.dot(dResults,np.T(data.getPatientData())),getLayersNumber());
+            double[][] dResults = np.subtract(ActivationFunc,patientDiagnosis);
+            double[][] dWeights = np.divide(np.dot(dResults,np.T(patientData)),getLayersNumber());
             double[][] dBiases  = np.divide(dResults,getLayersNumber());
 
             //Gradient descent

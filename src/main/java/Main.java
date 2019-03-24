@@ -7,7 +7,6 @@ public class Main {
         Data data=new Data(Main.class.getResource("dataset.csv"));
         data.print();
         NeuralNetwork NN=new NeuralNetwork(1,1000,data);
-        NN.learn(40000);
     }
 }
 
