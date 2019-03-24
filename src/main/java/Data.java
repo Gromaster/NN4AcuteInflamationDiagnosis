@@ -57,8 +57,8 @@ class Data {
         ArrayList<double[]> temp2=new ArrayList<>(Arrays.asList(this.getPatientDiagnoses()));
         temp1.add(newPatientData);
         temp2.add(newPatientDiagnosis);
-        this.setPatientDiagnoses((double[][]) temp1.toArray());
-        this.setPatientData((double[][]) temp2.toArray());
+        this.setPatientData(temp1.toArray(this.getPatientData()));
+        this.setPatientDiagnoses(temp2.toArray(this.getPatientDiagnoses()));
     }
 
 
