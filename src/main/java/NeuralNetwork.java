@@ -99,7 +99,7 @@ class NeuralNetwork {
     private void learn(double[][] patientData,double[][] patientDiagnosis,int epochs, final boolean momentumOccurrence){
         weights     = np.random(getNodesNumber(),patientData[0].length);
         biases      = new double[getNodesNumber()][patientData.length];
-
+        int m=patientData.length;
         if(patientData==null || patientDiagnosis==null) {
             throw new EmptyDataException("No data given to the NN");
         }
@@ -118,12 +118,12 @@ class NeuralNetwork {
             //Forward Propagation
             double[][] Results          = np.add(np.dot(weights, patientData), biases);
             double[][] ActivationFunc   = np.sigmoid(Results);
-            double cost                 = np.cross_entropy(patientData.length, patientDiagnosis, ActivationFunc);
+            double cost                 = np.cross_entropy(m, patientDiagnosis, ActivationFunc);
 
             //Back Propagation
             double[][] dResults = np.subtract(ActivationFunc,patientDiagnosis);
-            double[][] dWeights = np.divide(np.dot(dResults,np.T(patientData)),patientData.length);
-            double[][] dBiases  = np.divide(dResults,patientData.length);
+            double[][] dWeights = np.divide(np.dot(dResults,np.T(patientData)),m);
+            double[][] dBiases  = np.divide(dResults,m);
 
             //Momentum service
             if(AccumulatorOfWeights == null || AccumulatorOfBiases == null){
