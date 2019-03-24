@@ -25,7 +25,7 @@ class NeuralNetwork {
                 e.printStackTrace();
             }
             for(int learnSetIterations=1000;learnSetIterations<5000;learnSetIterations+=1000){
-                learn(learnData.getPatientData(),learnData.getPatientDiagnoses(),learnSetIterations);
+                learn(learnData.getPatientData(),learnData.getPatientDiagnoses(),learnSetIterations,true);
                 test(testData.getPatientData(),testData.getPatientDiagnoses());
             }
 
@@ -52,7 +52,12 @@ class NeuralNetwork {
      }
 
 
-    private void learn(double[][] patientData,double[][]patientDiagnosis,int iterations){
+    private int getLayersNumber() {
+        return layersNumber;
+    }
+
+    private void learn(double[][] patientData,double[][]patientDiagnosis,int iterations, final boolean MomentumOccurence){
+
         if(patientData==null || patientDiagnosis==null) {
             throw new EmptyDataException("No data given to the NN");
         }
@@ -60,7 +65,12 @@ class NeuralNetwork {
             patientData         = np.T(patientData);
             patientDiagnosis    = np.T(patientDiagnosis);
         }
+
         double alfa=  0.01;
+        double beta=1/(1-alfa);
+        double[][] AccumulatorOfWeights=null;
+        double[][] AccumulatorOfBiases=null;
+
         for(int i=0;i<iterations;i++) {
             //Forward Propagation
             double[][] Results          = np.add(np.dot(weights, patientData), biases);
@@ -72,19 +82,30 @@ class NeuralNetwork {
             double[][] dWeights = np.divide(np.dot(dResults,np.T(patientData)),getLayersNumber());
             double[][] dBiases  = np.divide(dResults,getLayersNumber());
 
+            //Momentum service
+            if(AccumulatorOfWeights == null || AccumulatorOfBiases == null){
+                AccumulatorOfWeights = new double[dWeights.length][dWeights[0].length];
+                AccumulatorOfBiases  = new double[dBiases.length][dBiases[0].length];
+            }
+
+            if(MomentumOccurence) {
+                AccumulatorOfWeights = np.add(np.multiply(beta,AccumulatorOfWeights),np.multiply(1-beta,dWeights));
+                AccumulatorOfBiases  = np.add(np.multiply(beta,AccumulatorOfBiases),np.multiply(1-beta,dBiases));
+            }
+            else {
+                AccumulatorOfWeights = dWeights;
+                AccumulatorOfBiases  = dBiases;
+            }
+
             //Gradient descent
-            weights = np.subtract(weights,np.multiply(alfa, dWeights));
-            biases  = np.subtract(biases,np.multiply(alfa,dBiases));
+            weights = np.subtract(weights, np.multiply(alfa, AccumulatorOfWeights));
+            biases  = np.subtract(biases, np.multiply(alfa, AccumulatorOfBiases));
             if(i%(iterations/10)==0){
                 System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~");
                 System.out.println("Cost = "+cost);
                 System.out.println("Predictions = " +Arrays.deepToString(ActivationFunc));
             }
         }
-    }
-
-    private int getLayersNumber() {
-        return layersNumber;
     }
 
     private void setLayersNumber(int layersNumber) {
