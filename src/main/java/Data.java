@@ -13,10 +13,10 @@ class Data {
         dataAcquisition(filePath);
     }
 
-    Data(int numberOfRecords,int numberOfParameters,int numberOfDiagnoses) {
-        setNumberOfRecords(numberOfRecords);
-        this.patientData        = new double[numberOfRecords][numberOfParameters];
-        this.patientDiagnoses   = new double[numberOfRecords][numberOfDiagnoses];
+    Data(int numberOfParameters,int numberOfDiagnoses) {
+        this.setNumberOfRecords(0);
+        this.patientData        = new double[this.numberOfRecords][numberOfParameters];
+        this.patientDiagnoses   = new double[this.numberOfRecords][numberOfDiagnoses];
     }
 
     private void dataAcquisition(URL filePath) {
@@ -59,6 +59,7 @@ class Data {
         temp2.add(newPatientDiagnosis);
         this.setPatientData(temp1.toArray(this.getPatientData()));
         this.setPatientDiagnoses(temp2.toArray(this.getPatientDiagnoses()));
+        this.setNumberOfRecords(this.getNumberOfRecords()+1);
     }
 
 
@@ -73,6 +74,7 @@ class Data {
 
     private void setPatientData(double[][] patientData) {
          this.patientData = patientData;
+
      }
 
     private void setPatientDiagnoses(double[][] patientDiagnoses) {
@@ -80,8 +82,9 @@ class Data {
      }
 
      void print(){
-        System.out.printf("%20s\t%20s\t%20s\t%20s\t%20s\t%20s\t%20s\t%20s\n","Temperature of patient","Occurrence of nausea","Lumbar pain","Urine pushing","Micturition pains","Burning of urethra","dec: Inflammation","dec: Nephritis");
+        System.out.printf("%25s\t%20s\t%20s\t%20s\t%20s\t%20s\t%20s\t%20s\n","Temperature of patient","Occurrence of nausea","Lumbar pain","Urine pushing","Micturition pains","Burning of urethra","dec: Inflammation","dec: Nephritis");
         for(int i=0;i<patientData.length;i++) {
+            System.out.printf("%-5d",i);
             for (int j = 0; j < patientData[i].length; j++)
                 System.out.printf("%20f\t", patientData[i][j]);
             for (int j = 0; j < patientDiagnoses[i].length;j++)
@@ -98,7 +101,7 @@ class Data {
     int getNumberOfRecords() {
          return numberOfRecords;
      }
-     void setNumberOfRecords(int numberOfRecords) {
+     private void setNumberOfRecords(int numberOfRecords) {
          this.numberOfRecords = numberOfRecords;
      }
  }

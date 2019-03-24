@@ -10,22 +10,21 @@ class NeuralNetwork {
         this.setLayersNumber(layersNumber);
         this.setNodesNumber(nodesNumber);
         this.data   = data;
-        weights     = np.random(getLayersNumber(),data.getPatientData()[0].length);
-        biases      = new double[getLayersNumber()][data.getPatientData().length];
 
     }
 
     void runTnTby2cv(int numberOfRepeats){
         for(int i=0;i<numberOfRepeats;i++){
-            Data learnData  = new Data(data.getNumberOfRecords()/2,data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
-            Data testData   = new Data(data.getNumberOfRecords()/2,data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
+            Data learnData  = new Data(data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
+            Data testData   = new Data(data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
             try {
                 divideDataSet(learnData,testData);
+                learnData.print();
             } catch (Exception e) {
                 e.printStackTrace();
             }
             for(int learnSetIterations=1000;learnSetIterations<5000;learnSetIterations+=1000){
-                System.out.printf("\n~~~~~~~~~~~~~~~~~~~~~~~~\nLearnset number of epochs: %d",learnSetIterations);
+                System.out.printf("\n~~~~~~~~~~~~~~~~~~~~~~~~\nLearn set number of epochs: %d\n",learnSetIterations);
                 learn(learnData.getPatientData(),learnData.getPatientDiagnoses(),learnSetIterations,true);
                 test(testData.getPatientData(),testData.getPatientDiagnoses());
             }
@@ -38,15 +37,14 @@ class NeuralNetwork {
         double[][] Results          = np.add(np.dot(weights, patientData), biases);
         double[][] ActivationFunc   = np.sigmoid(Results);
         double cost                 = np.cross_entropy(getLayersNumber(), patientDiagnosis, ActivationFunc);
-        double[][] Validation=null;
-        Validation=resultsComparison(ActivationFunc,patientDiagnosis);
+        double[][] Validation=resultsComparison(ActivationFunc,patientDiagnosis);
 
         System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~\nValidation phase");
         System.out.println("Cost = "+cost);
         System.out.println("Results:");
-        System.out.printf("%10s\t%10s\t%15s\t%30s\t\n","Acc","Sensivity","False alarm","Positive predictivity value");
-        for(int i=0;i<Validation.length;i++)
-            System.out.printf("%10f\t%10f\t%15f\t%30f\t",Validation[i][0],Validation[i][1],Validation[i][2],Validation[i][3]);
+        System.out.printf("%10s\t%10s\t%15s\t%30s\t\n","Acc","Sensitivity","False alarm","Positive predictivity value");
+        for(double[] i:Validation)
+            System.out.printf("%10f\t%10f\t%15f\t%30f\t", i[0], i[1], i[2], i[3]);
      }
 
     private double[][] resultsComparison(double[][] NNdiagnoze, double[][] patientState) {
@@ -81,10 +79,12 @@ class NeuralNetwork {
     private void divideDataSet(Data learnData,Data testData) throws Exception {
          Random r=new Random();
          for(int i=0;i<data.getNumberOfRecords();i++){
-             if(r.nextBoolean()&&(learnData.getNumberOfRecords()<(data.getNumberOfRecords()/2)))
-                 learnData.appendData(data.getPatientData()[i],data.getPatientDiagnoses()[i]);
-             else if(testData.getNumberOfRecords()<(data.getNumberOfRecords()/2))
-                 testData.appendData(data.getPatientData()[i],data.getPatientDiagnoses()[i]);
+             if(r.nextBoolean() && (learnData.getNumberOfRecords()<(data.getNumberOfRecords()/2))) {
+                 learnData.appendData(data.getPatientData()[i], data.getPatientDiagnoses()[i]);
+             }
+             else if(testData.getNumberOfRecords()<(data.getNumberOfRecords()/2)) {
+                 testData.appendData(data.getPatientData()[i], data.getPatientDiagnoses()[i]);
+             }
              else
                  learnData.appendData(data.getPatientData()[i],data.getPatientDiagnoses()[i]);
          }
@@ -96,7 +96,9 @@ class NeuralNetwork {
         return layersNumber;
     }
 
-    private void learn(double[][] patientData,double[][]patientDiagnosis,int iterations, final boolean MomentumOccurence){
+    private void learn(double[][] patientData,double[][] patientDiagnosis,int epochs, final boolean momentumOccurrence){
+        weights     = np.random(getNodesNumber(),patientData[0].length);
+        biases      = new double[getNodesNumber()][patientData.length];
 
         if(patientData==null || patientDiagnosis==null) {
             throw new EmptyDataException("No data given to the NN");
@@ -111,17 +113,17 @@ class NeuralNetwork {
         double[][] AccumulatorOfWeights=null;
         double[][] AccumulatorOfBiases=null;
 
-        for(int i=0;i<iterations;i++) {
+        for(int i=0;i<epochs;i++) {
 
             //Forward Propagation
             double[][] Results          = np.add(np.dot(weights, patientData), biases);
             double[][] ActivationFunc   = np.sigmoid(Results);
-            double cost                 = np.cross_entropy(getLayersNumber(), patientDiagnosis, ActivationFunc);
+            double cost                 = np.cross_entropy(patientData.length, patientDiagnosis, ActivationFunc);
 
             //Back Propagation
             double[][] dResults = np.subtract(ActivationFunc,patientDiagnosis);
-            double[][] dWeights = np.divide(np.dot(dResults,np.T(patientData)),getLayersNumber());
-            double[][] dBiases  = np.divide(dResults,getLayersNumber());
+            double[][] dWeights = np.divide(np.dot(dResults,np.T(patientData)),patientData.length);
+            double[][] dBiases  = np.divide(dResults,patientData.length);
 
             //Momentum service
             if(AccumulatorOfWeights == null || AccumulatorOfBiases == null){
@@ -129,7 +131,7 @@ class NeuralNetwork {
                 AccumulatorOfBiases  = new double[dBiases.length][dBiases[0].length];
             }
 
-            if(MomentumOccurence) {
+            if(momentumOccurrence) {
                 AccumulatorOfWeights = np.add(np.multiply(beta,AccumulatorOfWeights),np.multiply(1-beta,dWeights));
                 AccumulatorOfBiases  = np.add(np.multiply(beta,AccumulatorOfBiases),np.multiply(1-beta,dBiases));
             }
@@ -137,11 +139,11 @@ class NeuralNetwork {
                 AccumulatorOfWeights = dWeights;
                 AccumulatorOfBiases  = dBiases;
             }
-
+            System.out.println("Jestem tutaj");
             //Gradient descent
             weights = np.subtract(weights, np.multiply(alfa, AccumulatorOfWeights));
             biases  = np.subtract(biases, np.multiply(alfa, AccumulatorOfBiases));
-            if(i%(iterations/10)==0){
+            if(i%(epochs/10)==0){
                 System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~\nLearning phase");
                 System.out.println("Cost = "+cost);
                 System.out.println("Predictions = " +Arrays.deepToString(ActivationFunc));
