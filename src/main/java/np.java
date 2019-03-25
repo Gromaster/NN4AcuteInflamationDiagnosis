@@ -208,6 +208,17 @@ public class np {
         return c;
     }
 
+    public static double multiply(double[] a, double[] b){
+        int m1 = a.length;
+        int m2 = b.length;
+        if(m1!=m2){
+            throw new RuntimeException("Illegal dimensions");
+        }
+        double c= 0;
+        for(int i=0;i<m1;i++)
+            c+=a[i]*b[i];
+        return c;
+    }
     /**
      * @param a matrix
      * @param b matrix
@@ -322,7 +333,16 @@ public class np {
         }
         return z;
     }
+    public static double[] sigmoid(double[] a) {
+        int m = a.length;
+        double[] z = new double[m];
 
+        for (int i = 0; i < m; i++) {
+            z[i] = (1.0 / (1 + Math.exp(-a[i])));
+
+        }
+        return z;
+    }
     /**
      * Element wise division
      *
@@ -367,6 +387,21 @@ public class np {
             for (int j = 0; j < n; j++) {
                 sum += z[i][j];
             }
+        }
+        return -sum / batch_size;
+    }
+
+    public static double cross_entropy(int batch_size, double[] Y, double[] A) {
+        int m = A.length;
+        double[] z = new double[m];
+
+        for (int i = 0; i < m; i++) {
+            z[i] = (Y[i] * Math.log(A[i])) + ((1 - Y[i]) * Math.log(1 - A[i]));
+        }
+
+        double sum = 0;
+        for (int i = 0; i < m; i++) {
+            sum += z[i];
         }
         return -sum / batch_size;
     }
