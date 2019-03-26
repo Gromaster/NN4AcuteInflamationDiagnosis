@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args){
 
         Data data=new Data(Main.class.getResource("dataset.csv"));
-        NeuralNetwork NN=new NeuralNetwork(1,1000,data);
+        NeuralNetwork NN=new NeuralNetwork(2,1000,data);
         NN.runTnTby2cv(5);
     }
 }

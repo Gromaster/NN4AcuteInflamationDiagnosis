@@ -1,11 +1,11 @@
-import java.util.Arrays;
 import java.util.Random;
 
 class NeuralNetwork {
-    private int nodesNumber, layersNumber;
+    private int nodesNumber, numberOfHiddenLayers;
     private double[][][] weights;
     private double[][] biases;
     private Data data;
+    private int numberOfInputAttributes;
 
      NeuralNetwork(int layersNumber, int nodesNumber, Data data) {
         this.setLayersNumber(layersNumber);
@@ -14,7 +14,7 @@ class NeuralNetwork {
 
     }
 
-    void runTnTby2cv(int numberOfRepeats, int numberOfLayers){
+    void runTnTby2cv(int numberOfRepeats){
         for(int i=0;i<numberOfRepeats;i++){
             Data learnData  = new Data(data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
             Data testData   = new Data(data.getPatientData()[0].length,data.getPatientDiagnoses()[0].length);
@@ -37,7 +37,7 @@ class NeuralNetwork {
 /*
         double[][] Results          = np.add(np.dot(weights, patientData), biases);
         double[][] ActivationFunc   = np.sigmoid(Results);
-        double cost                 = np.cross_entropy(getLayersNumber(), patientDiagnosis, ActivationFunc);
+        double cost                 = np.cross_entropy(getNumberOfHiddenLayers(), patientDiagnosis, ActivationFunc);
         double[][] Validation=resultsComparison(ActivationFunc,patientDiagnosis);
 
         System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~\nValidation phase");
@@ -93,21 +93,27 @@ class NeuralNetwork {
      }
 
 
-    private int getLayersNumber() {
-        return layersNumber;
+    private int getNumberOfHiddenLayers() {
+        return numberOfHiddenLayers;
     }
 
-    private void learn(double[][] patientsData,double[][] patientDiagnosis,int epochs, final boolean momentumOccurrence){
-        weights     = new double[getLayersNumber()+1][][];
-        biases      = new double[getLayersNumber()+1][];
-         for(int i=0;i<weights.length;i++)
-            weights[i] = np.random(getNodesNumber(),patientsData[0].length);
-         for(int i=0;i<biases.length;i++)
-             biases[i]   = new double[getNodesNumber()];
-        int batchSize=patientsData.length;
+    private void learn(double[][] patientsData,double[][] patientsDiagnosis,int epochs, final boolean momentumOccurrence){
+        weights     = new double[getNumberOfHiddenLayers()+1][][];
+        biases      = new double[getNumberOfHiddenLayers()+1][];
 
+        weights[0]=new double[getNodesNumber()][patientsData[0].length];
+        for(int i=1;i<weights.length-1;i++)
+            weights[i] = np.random(getNodesNumber(),weights[i-1].length);
+        weights[getNumberOfHiddenLayers()]=new double[patientsDiagnosis[0].length][getNodesNumber()];
+         
+        for(int i=0;i<biases.length-1;i++)
+             biases[i]   = new double[getNodesNumber()];
+        biases[getNumberOfHiddenLayers()]=new double[patientsDiagnosis[0].length];
+
+        int batchSize=patientsData.length;
+/*
         patientsData         = np.T(patientsData);
-        patientDiagnosis    = np.T(patientDiagnosis);
+        patientsDiagnosis    = np.T(patientsDiagnosis);*/
 
         double alfa=  0.01;
         double beta=(1-alfa);
@@ -116,20 +122,26 @@ class NeuralNetwork {
 
         for(int i=0;i<epochs;i++) {
             double cost;
-            //Forward Propagation
             for(int j=0;j<batchSize;j++) {
+                //Forward Propagation
                 double[][] Output = forwardPropagation(weights, patientsData[j], biases);
-                cost = np.cross_entropy(batchSize, patientDiagnosis[j], Output[Output.length - 1]);
+                cost = np.cross_entropy(batchSize, patientsDiagnosis[j], Output[Output.length - 1]);
+                if(i%100==0 && j%10==0)
+                    System.out.println("Epoch: "+i+"\tIteration: " +j+"\tCost:"+cost);
+
+                //Back propagation
+
+
             }
                 /*
             //Back Propagation
-            double[][] dResults = np.subtract(Output[getLayersNumber()],patientDiagnosis);
+            double[][] dResults = np.subtract(Output[getNumberOfHiddenLayers()],patientDiagnosis);
             double[][] dWeights = np.divide(np.dot(dResults,np.T(patientData)),batchSize);
             double[][] dBiases  = np.divide(dResults,batchSize);
 
             //Momentum service
             if(AccumulatorOfWeights == null || AccumulatorOfBiases == null){
-                AccumulatorOfWeights = new double[getLayersNumber()][dWeights.length][dWeights[0].length];
+                AccumulatorOfWeights = new double[getNumberOfHiddenLayers()][dWeights.length][dWeights[0].length];
                 AccumulatorOfBiases  = new double[dBiases.length][dBiases[0].length];
             }
 
@@ -154,27 +166,25 @@ class NeuralNetwork {
     }
 
     private double[][] forwardPropagation(double[][][] weights, double[] patientData, double[][] biases) {
-        double [][] act     = new double[getLayersNumber()][];
-        double[] results    = computeResultsForSingleLayer(weights[0], patientData, biases[0]);
+        int m=getNumberOfHiddenLayers();
+        double [][] results = new double[m+1][];
+        results[0]          = computeResultsForSingleLayer(weights[0], patientData, biases[0]);
+        for(int actualLayer=1;actualLayer<m;actualLayer++)
+            results[actualLayer] = computeResultsForSingleLayer(weights[actualLayer],results[actualLayer-1],biases[actualLayer]);
 
-        for(int actualLayer=1;actualLayer<getLayersNumber()-1;actualLayer++){
-            results             = computeResultsForSingleLayer(weights[actualLayer],results,biases[actualLayer]);
-            act[actualLayer]    = np.sigmoid(results);
-        }
+        results[m] = computeResultsForSingleLayer(weights[m], results[m-1], biases[m]);
 
-        results                     = computeResultsForSingleLayer(weights[getLayersNumber()-1], results, biases[getLayersNumber()-1]);
-        act[getLayersNumber()-1]    = np.sigmoid(results);
-        return act;
+        return results;
     }
-    private double[] computeResultsForSingleLayer(double[][] weights,double[] input, double[] biases){
-         if(weights.length!=biases.length)throw new RuntimeException("Different number of weights and biases for single layer");
-         double[] results=new double[biases.length];
-         for(int i=0;i<results.length;i++)
-            results[i] = np.multiply(weights[i], input) +biases[i];
-         return results;
+
+    private double[] computeResultsForSingleLayer(double[][] weightsOnSingleLayer,double[] input, double[] biases) {
+         if(weightsOnSingleLayer.length!=biases.length)throw new RuntimeException("Different number of weights and biases for single layer");
+         double[] results = np.add(np.dot(weightsOnSingleLayer,input),biases);
+         return np.sigmoid(results);
     }
+
     private void setLayersNumber(int layersNumber) {
-        this.layersNumber = layersNumber;
+        this.numberOfHiddenLayers = layersNumber;
     }
 
     private int getNodesNumber() {
@@ -183,6 +193,14 @@ class NeuralNetwork {
 
     private void setNodesNumber(int nodesNumber) {
         this.nodesNumber = nodesNumber;
+    }
+
+    public int getNumberOfInputAttributes() {
+        return numberOfInputAttributes;
+    }
+
+    public void setNumberOfInputAttributes(int numberOfInputAttributes) {
+        this.numberOfInputAttributes = numberOfInputAttributes;
     }
 
     private class EmptyDataException extends RuntimeException {

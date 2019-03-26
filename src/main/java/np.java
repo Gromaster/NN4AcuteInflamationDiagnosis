@@ -2,8 +2,8 @@ import java.util.Random;
 
 /**
  *
- * @author Deus Jeraldy
- * @Email: deusjeraldy@gmail.com
+ * based on class made by Deus Jeraldy
+ *
  */
 
 public class np {
@@ -172,6 +172,14 @@ public class np {
         return c;
     }
 
+    public static double[] add(double[] a, double[] b) {
+        int m = a.length;
+        double[] c = new double[m];
+        for (int i = 0; i < m; i++) {
+            c[i] = a[i] + b[i];
+        }
+        return c;
+    }
     /**
      * @param a matrix
      * @param b matrix
@@ -217,6 +225,21 @@ public class np {
         double c= 0;
         for(int i=0;i<m1;i++)
             c+=a[i]*b[i];
+        return c;
+    }
+    public static double[] dot(double[][] a,double[] b){
+        int m1 = a.length;
+        int n1 = a[0].length;
+        int m2 = b.length;
+        if (n1 != m2) {
+            throw new RuntimeException("Illegal matrix dimensions.");
+        }
+        double[] c = new double[m1];
+        for (int i = 0; i < m1; i++) {
+            for (int k = 0; k < n1; k++) {
+                c[i] += a[i][k] * b[k];
+            }
+        }
         return c;
     }
     /**
@@ -392,17 +415,13 @@ public class np {
     }
 
     public static double cross_entropy(int batch_size, double[] Y, double[] A) {
-        int m = A.length;
-        double[] z = new double[m];
-
-        for (int i = 0; i < m; i++) {
-            z[i] = (Y[i] * Math.log(A[i])) + ((1 - Y[i]) * Math.log(1 - A[i]));
-        }
-
+        if(Y.length!=A.length)throw new RuntimeException("Illegal dimensions");
         double sum = 0;
-        for (int i = 0; i < m; i++) {
-            sum += z[i];
+
+        for (int i = 0; i < Y.length; i++) {
+            sum += (Y[i] * Math.log(A[i])) + ((1 - Y[i]) * Math.log(1 - A[i]));
         }
+
         return -sum / batch_size;
     }
     public static double[][] softmax(double[][] z) {
