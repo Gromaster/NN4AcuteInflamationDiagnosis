@@ -6,13 +6,14 @@ import java.util.ArrayList;
 
 public abstract class NeuralLayer {
     protected int numberOfNeuronsInLayer;
-    private ArrayList<Neuron> neurons;
+    private ArrayList<Neuron> neurons=new ArrayList<>();
     protected IActivationFunction activationFunction;
     protected NeuralLayer previousLayer;
     protected NeuralLayer nextLayer;
     protected ArrayList<Double> input;
     protected ArrayList<Double> output;
     protected int numberOfInputs;
+
 
 
 

@@ -6,30 +6,37 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Neuron {
-    protected ArrayList<Double> weights;
+    private ArrayList<Double> weights;
     private ArrayList<Double> input;
     private Double output;
     private Double outputBeforeActivation;
-    protected Double bias=1.0;
-    private int numberOfInputs=0;
+    private Double bias = 1.0;
+    private int numberOfInputs;
     private IActivationFunction activationFunction;
+    private int i = 0;
 
 
-    public Neuron(int numberOfInputs, IActivationFunction activationFunction){
-        this.numberOfInputs=numberOfInputs;
-        weights =new ArrayList<>(numberOfInputs+1);
-        input=new ArrayList<>(numberOfInputs);
-        this.activationFunction=activationFunction;
+    Neuron(int numberOfInputs, IActivationFunction activationFunction) {
+        this.numberOfInputs = numberOfInputs;
+        weights = new ArrayList<>(numberOfInputs);
+        input = new ArrayList<>(numberOfInputs);
+        System.out.println(weights.size()+"\t"+ numberOfInputs);
+        this.activationFunction = activationFunction;
     }
 
-    public void init(){
-        Random r=new Random();
-        for(int i=0;i<numberOfInputs;i++){
-            this.weights.set(i,r.nextDouble());
+     void init(){
+        Random r=new Random(0);
+        for(int i=0;i<numberOfInputs+1;i++){
+            try{
+                this.weights.set(i,r.nextDouble());
+            }
+            catch(IndexOutOfBoundsException e)
+            {
+                weights.add(r.nextDouble());
+            }
         }
     }
-
-    public void calc(){
+     void calc(){
         outputBeforeActivation=0.0;
         if(numberOfInputs>0) {
             if (input != null && weights != null) {
@@ -53,11 +60,11 @@ public class Neuron {
         return input;
     }
 
-    public void setInput(ArrayList<Double> input) {
+     void setInput(ArrayList<Double> input) {
         this.input = input;
     }
 
-    public Double getOutput() {
+     Double getOutput() {
         return output;
     }
 
@@ -93,7 +100,7 @@ public class Neuron {
         return activationFunction;
     }
 
-    public void setActivationFunction(IActivationFunction activationFunction) {
+     void setActivationFunction(IActivationFunction activationFunction) {
         this.activationFunction = activationFunction;
     }
 }

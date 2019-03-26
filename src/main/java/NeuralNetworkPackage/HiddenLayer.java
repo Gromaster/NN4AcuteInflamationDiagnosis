@@ -7,5 +7,6 @@ public class HiddenLayer extends NeuralLayer{
         this.numberOfNeuronsInLayer=numberOfNeurons;
         this.activationFunction=activationFunction;
         this.numberOfInputs=numberOfInputs;
+        init();
     }
 }
