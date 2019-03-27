@@ -8,7 +8,7 @@ import java.util.Random;
 public class Neuron {
     private ArrayList<Double> weights;
     private ArrayList<Double> input;
-    private Double output;
+    private Double output=0.0;
     private Double outputBeforeActivation;
     private Double bias = 1.0;
     private int numberOfInputs;
@@ -18,14 +18,14 @@ public class Neuron {
 
     Neuron(int numberOfInputs, IActivationFunction activationFunction) {
         this.numberOfInputs = numberOfInputs;
-        weights = new ArrayList<>(numberOfInputs);
+        weights = new ArrayList<>((numberOfInputs+1));
         input = new ArrayList<>(numberOfInputs);
-        System.out.println(weights.size()+"\t"+ numberOfInputs);
         this.activationFunction = activationFunction;
+        init();
     }
 
      void init(){
-        Random r=new Random(0);
+        Random r=new Random();
         for(int i=0;i<numberOfInputs+1;i++){
             try{
                 this.weights.set(i,r.nextDouble());
@@ -48,11 +48,11 @@ public class Neuron {
         output=activationFunction.calc(outputBeforeActivation);
     }
 
-    public ArrayList<Double> getWeights() {
+     ArrayList<Double> getWeights() {
         return weights;
     }
 
-    public void setWeights(ArrayList<Double> weights) {
+     void setWeights(ArrayList<Double> weights) {
         this.weights = weights;
     }
 
@@ -64,12 +64,8 @@ public class Neuron {
         this.input = input;
     }
 
-     Double getOutput() {
+    Double getOutput() {
         return output;
-    }
-
-    public void setOutput(Double output) {
-        this.output = output;
     }
 
     public Double getOutputBeforeActivation() {
@@ -102,5 +98,8 @@ public class Neuron {
 
      void setActivationFunction(IActivationFunction activationFunction) {
         this.activationFunction = activationFunction;
+    }
+    public String toString(){
+        return "Neuron: "+ "Input:"+this.input +" weights: "+weights.toString()+"\n";
     }
 }

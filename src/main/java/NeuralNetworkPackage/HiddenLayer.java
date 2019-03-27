@@ -2,11 +2,9 @@ package NeuralNetworkPackage;
 
 import ActivationFunctions.IActivationFunction;
 
-public class HiddenLayer extends NeuralLayer{
-    public HiddenLayer(int numberOfNeurons, IActivationFunction activationFunction,int numberOfInputs){
-        this.numberOfNeuronsInLayer=numberOfNeurons;
-        this.activationFunction=activationFunction;
-        this.numberOfInputs=numberOfInputs;
+ class HiddenLayer extends NeuralLayer{
+     HiddenLayer(int numberOfInputs,int numberOfNeurons, IActivationFunction activationFunction){
+        super(numberOfInputs,numberOfNeurons,activationFunction);
         init();
     }
 }

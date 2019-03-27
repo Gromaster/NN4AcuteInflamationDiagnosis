@@ -12,7 +12,7 @@ public class Main {
         int numberOfInputs=2;
         int numberOfOutputs=1;
         int numberOfHiddenLayers=1;
-        int[] numberOfHiddenNeurons= { 100 };
+        int[] numberOfHiddenNeurons= { 10 };
         IActivationFunction[] hiddenAcFnc = { ActivationFunction.SIGMOID } ;
         System.out.println("Creating Neural Network...");
         NeuralNetwork nn = new NeuralNetwork(numberOfInputs, numberOfHiddenLayers,
@@ -20,7 +20,7 @@ public class Main {
         System.out.println("Neural Network created!");
 
         ArrayList<Double> neuralInput = new ArrayList<>( Arrays.asList(1.5,0.5) );
-        ArrayList<Double> neuralOutput = new ArrayList<>(numberOfOutputs);
+        ArrayList<Double> neuralOutput;
         System.out.println("Feeding the values ["+neuralInput.get(0)+" ; "+
                 neuralInput.get(1)+"] to the neural network");
         nn.setInput(neuralInput);
