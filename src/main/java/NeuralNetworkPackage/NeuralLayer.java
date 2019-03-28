@@ -40,10 +40,7 @@ public abstract class NeuralLayer {
         for(int i=0;i<numberOfNeuronsInLayer;i++){
             neurons.get(i).setInput(this.input);
             neurons.get(i).calc();
-            System.out.println("Neuron nr "+i+" output: "+neurons.get(i).getOutput());
             try{
-                System.out.println(neurons.toString());
-
                 output.set(i,neurons.get(i).getOutput());
             }
             catch (IndexOutOfBoundsException | NullPointerException e){

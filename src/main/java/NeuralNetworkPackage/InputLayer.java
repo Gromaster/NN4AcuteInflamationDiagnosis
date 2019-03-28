@@ -19,14 +19,11 @@ public class InputLayer extends NeuralLayer{
                 neurons.get(i).setActivationFunction(activationFunction);
                 neurons.get(i).setWeights(new ArrayList<>(Collections.nCopies(numberOfInputs+1,0.0)));
                 neurons.get(i).getWeights().set(i,1.0);
-
-                System.out.println(neurons.get(i).getWeights().toString());
             }
             catch(IndexOutOfBoundsException | NullPointerException e) {
                 neurons.add(new Neuron(numberOfInputs,activationFunction));
                 neurons.get(i).setWeights(new ArrayList<>(Collections.nCopies(numberOfInputs+1,0.0)));
                 neurons.get(i).getWeights().set(i,1.0);
-                System.out.println(neurons.get(i).getWeights().toString()+" w catch");
             }
         }
     }
