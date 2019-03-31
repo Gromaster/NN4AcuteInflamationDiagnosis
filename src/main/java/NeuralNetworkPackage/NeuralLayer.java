@@ -3,7 +3,6 @@ package NeuralNetworkPackage;
 import ActivationFunctions.IActivationFunction;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public abstract class NeuralLayer {
      int numberOfNeuronsInLayer;
@@ -11,13 +10,23 @@ public abstract class NeuralLayer {
      IActivationFunction activationFunction;
      private NeuralLayer previousLayer;
      private NeuralLayer nextLayer;
-     private ArrayList<Double> input;
-     private ArrayList<Double> output;
+     private ArrayList<Double> inputs;
+     private ArrayList<Double> outputs;
      int numberOfInputs;
 
+    public NeuralLayer(NeuralLayer origin) {
+        setNumberOfNeuronsInLayer(origin.getNumberOfNeuronsInLayer());
+        setNeurons(origin.getNeurons());
+        setActivationFunction(origin.getActivationFunction());
+        setPreviousLayer(origin.getPreviousLayer());
+        setNextLayer(origin.getNextLayer());
+        setInputs(origin.getInputs());
+        setOutputs(origin.getOutputs());
+        setNumberOfInputs(origin.getNumberOfInputs());
+    }
 
-     NeuralLayer(int numberOfInputs,int numberOfNeuronsInLayer,IActivationFunction activationFunction){
-        this.numberOfNeuronsInLayer=numberOfNeuronsInLayer;
+    NeuralLayer(int numberOfInputs, int numberOfNeuronsInLayer, IActivationFunction activationFunction){
+        this.setNumberOfNeuronsInLayer(numberOfNeuronsInLayer);
         neurons=new ArrayList<>(numberOfNeuronsInLayer);
         this.activationFunction=activationFunction;
         this.numberOfInputs=numberOfInputs;
@@ -38,53 +47,92 @@ public abstract class NeuralLayer {
 
     void calc(){
         for(int i=0;i<numberOfNeuronsInLayer;i++){
-            neurons.get(i).setInput(this.input);
+            neurons.get(i).setInputs(inputs);
             neurons.get(i).calc();
             try{
-                output.set(i,neurons.get(i).getOutput());
+                outputs.set(i,neurons.get(i).getOutput());
             }
             catch (IndexOutOfBoundsException | NullPointerException e){
-                output.add(neurons.get(i).getOutput());
+                outputs.add(neurons.get(i).getOutput());
             }
         }
     }
 
-    NeuralLayer getPreviousLayer() {
+    public int getNumberOfNeuronsInLayer() {
+        return numberOfNeuronsInLayer;
+    }
+
+    public void setNumberOfNeuronsInLayer(int numberOfNeuronsInLayer) {
+        this.numberOfNeuronsInLayer = numberOfNeuronsInLayer;
+    }
+
+    public ArrayList<Neuron> getNeurons() {
+        ArrayList<Neuron> returnList=new ArrayList<>(neurons.size());
+        for(Neuron n:neurons)
+            returnList.add(new Neuron(n));
+        return returnList;
+    }
+
+    public void setNeurons(ArrayList<Neuron> neurons) {
+        for(Neuron n:neurons)
+            this.neurons.add(new Neuron(n));
+        this.neurons = neurons;
+    }
+
+    public IActivationFunction getActivationFunction() {
+        return activationFunction;
+    }
+
+    public void setActivationFunction(IActivationFunction activationFunction) {
+        this.activationFunction = activationFunction;
+    }
+
+    public NeuralLayer getPreviousLayer() {
         return previousLayer;
     }
 
-    void setPreviousLayer(NeuralLayer previousLayer) {
+    public void setPreviousLayer(NeuralLayer previousLayer) {
         this.previousLayer = previousLayer;
-        if(previousLayer!=null) {
-            if(this.numberOfInputs!=previousLayer.numberOfNeuronsInLayer)throw new RuntimeException("Illegal previous layer");
-            setInput(new ArrayList<>(previousLayer.numberOfNeuronsInLayer));
-        }
     }
 
     public NeuralLayer getNextLayer() {
         return nextLayer;
     }
 
-    void setNextLayer(NeuralLayer nextLayer) {
-
+    public void setNextLayer(NeuralLayer nextLayer) {
         this.nextLayer = nextLayer;
-        if(nextLayer!=null) setOutput(new ArrayList<>(nextLayer.numberOfNeuronsInLayer));
-        else setOutput(new ArrayList<>(this.numberOfNeuronsInLayer));
     }
 
-    public ArrayList<Double> getInput() {
-        return input;
+    public ArrayList<Double> getInputs() {
+        return new ArrayList<>(inputs);
     }
 
-    void setInput(ArrayList<Double> input) {
-        this.input = input;
+    public void setInputs(ArrayList<Double> input) {
+        this.inputs = new ArrayList<>(input);
     }
 
-    ArrayList<Double> getOutput() {
-        return output;
+    public ArrayList<Double> getOutputs() {
+        return new ArrayList<>(outputs);
     }
 
-    private void setOutput(ArrayList<Double> output) {
-        this.output = output;
+    public void setOutputs(ArrayList<Double> output) {
+        this.outputs = new ArrayList<>(output);
+    }
+
+    public double getWeight(int i, int j) {
+        return neurons.get(i).getWeights().get(j);
+    }
+
+    public int getNumberOfInputs() {
+        return numberOfInputs;
+    }
+
+    public void setNumberOfInputs(int numberOfInputs) {
+        this.numberOfInputs = numberOfInputs;
+    }
+
+
+    public Neuron getNeuron(int i) {
+        return new Neuron(neurons.get(i));
     }
 }

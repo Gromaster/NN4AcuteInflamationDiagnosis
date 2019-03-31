@@ -13,6 +13,10 @@ public class InputLayer extends NeuralLayer{
         init();
     }
 
+    InputLayer(InputLayer original){
+         super(original);
+    }
+
     protected void init(){
         for (int i=0;i<numberOfNeuronsInLayer;i++) {
             try {

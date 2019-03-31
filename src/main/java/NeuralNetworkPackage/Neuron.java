@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class Neuron {
     private ArrayList<Double> weights;
-    private ArrayList<Double> input;
+    private ArrayList<Double> inputs;
     private Double output=0.0;
     private Double outputBeforeActivation;
     private Double bias = 1.0;
@@ -16,10 +16,21 @@ public class Neuron {
     private int i = 0;
 
 
-    Neuron(int numberOfInputs, IActivationFunction activationFunction) {
+    public Neuron(Neuron original){
+        this.setWeights(original.getWeights());
+        this.setInputs(original.getInputs());
+        this.setOutput(original.getOutput());
+        this.setOutputBeforeActivation(original.getOutputBeforeActivation());
+        this.setBias(original.getBias());
+        this.setNumberOfInputs(original.getNumberOfInputs());
+        this.setActivationFunction(original.getActivationFunction());
+
+    }
+
+    public Neuron(int numberOfInputs, IActivationFunction activationFunction) {
         this.numberOfInputs = numberOfInputs;
         weights = new ArrayList<>((numberOfInputs+1));
-        input = new ArrayList<>(numberOfInputs);
+        inputs = new ArrayList<>(numberOfInputs);
         this.activationFunction = activationFunction;
         init();
     }
@@ -39,33 +50,41 @@ public class Neuron {
      void calc(){
         outputBeforeActivation=0.0;
         if(numberOfInputs>0) {
-            if (input != null && weights != null) {
+            if (inputs != null && weights != null) {
                 for (int i = 0; i <= numberOfInputs; i++) {
-                    outputBeforeActivation += (i == numberOfInputs ? bias : input.get(i)) * weights.get(i);
+                    outputBeforeActivation += (i == numberOfInputs ? bias : inputs.get(i)) * weights.get(i);
                 }
             }
         }
         output=activationFunction.calc(outputBeforeActivation);
     }
 
-     ArrayList<Double> getWeights() {
-        return weights;
+    public double getWeight(int i){
+        return weights.get(i);
     }
 
-     void setWeights(ArrayList<Double> weights) {
-        this.weights = weights;
+    public ArrayList<Double> getWeights() {
+        return new ArrayList<>(weights);
     }
 
-    public ArrayList<Double> getInput() {
-        return input;
+    public void setWeights(ArrayList<Double> weights) {
+        this.weights = new ArrayList<>(weights);
     }
 
-     void setInput(ArrayList<Double> input) {
-        this.input = input;
+    public ArrayList<Double> getInputs() {
+        return new ArrayList<>(inputs);
     }
 
-    Double getOutput() {
+    public void setInputs(ArrayList<Double> inputs) {
+        this.inputs = new ArrayList<>(inputs);
+    }
+
+    public Double getOutput() {
         return output;
+    }
+
+    public void setOutput(Double output) {
+        this.output = output;
     }
 
     public Double getOutputBeforeActivation() {
@@ -99,7 +118,12 @@ public class Neuron {
      void setActivationFunction(IActivationFunction activationFunction) {
         this.activationFunction = activationFunction;
     }
+
     public String toString(){
-        return "Neuron: "+ "Input:"+this.input +" weights: "+weights.toString()+"\n";
+        return "Neuron: "+ "Input:"+this.inputs +" weights: "+weights.toString()+"\n";
+    }
+
+    public Double getInput(int i) {
+        return inputs.get(i);
     }
 }

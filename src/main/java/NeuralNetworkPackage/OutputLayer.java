@@ -8,4 +8,14 @@ import ActivationFunctions.IActivationFunction;
         setNextLayer(null);
         init();
     }
+
+     public OutputLayer(OutputLayer original) {
+         super(original);
+     }
+
+     public Neuron getNeuron(int neuron){
+         if(neuron>=neurons.size())throw new ArrayIndexOutOfBoundsException();
+         else return neurons.get(neuron);
+    }
+
 }

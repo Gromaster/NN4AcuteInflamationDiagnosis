@@ -1,24 +1,34 @@
 import ActivationFunctions.ActivationFunction;
 import ActivationFunctions.IActivationFunction;
+import ActivationFunctions.Sigmoid;
+import Data.NeuralDataSet;
 import NeuralNetworkPackage.NeuralNetwork;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Main {
 
 
     public static void main(String[] args){
-        int numberOfInputs=2;
-        int numberOfOutputs=1;
-        int numberOfHiddenLayers=1;
-        int[] numberOfHiddenNeurons= { 10 };
-        IActivationFunction[] hiddenAcFnc = { ActivationFunction.SIGMOID } ;
+        int numberOfInputs=6;
+        int numberOfOutputs=2;
+        int numberOfHiddenLayers=2;
+        int[] numberOfHiddenNeurons= { 100,100 };
+
+
+
+
+
+        NeuralDataSet neuralDataSet =new NeuralDataSet(Main.class.getResource("dataset.csv").getPath());
+
+
+
+
+
+        IActivationFunction[] hiddenAcFnc = {ActivationFunction.SIGMOID} ;
         System.out.println("Creating Neural Network...");
         NeuralNetwork nn = new NeuralNetwork(numberOfInputs, numberOfHiddenLayers,
                 numberOfHiddenNeurons,hiddenAcFnc,numberOfOutputs,ActivationFunction.RELU);
         System.out.println("Neural Network created!");
-
 
     }
 }

@@ -2,7 +2,6 @@ package ActivationFunctions;
 
 public enum ActivationFunction implements IActivationFunction{
     STEP{
-        @Override
         public Double calc(Double outputBeforeActivation) {
             return outputBeforeActivation>0 ? 1.0 : 0.0;
         }

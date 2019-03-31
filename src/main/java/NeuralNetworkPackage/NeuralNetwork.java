@@ -3,6 +3,7 @@ package NeuralNetworkPackage;
 import ActivationFunctions.IActivationFunction;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class NeuralNetwork {
     private InputLayer inputLayer;
@@ -30,7 +31,7 @@ public class NeuralNetwork {
             for (int i = 0; i < numberOfHiddenLayers; i++) {
                 if (i == 0) {
                     hiddenLayers.add(new HiddenLayer(inputLayer.numberOfNeuronsInLayer, numberOfNeuronsInHiddenLayers[i],
-                            hiddenActivationFunction[i]));
+                            (hiddenActivationFunction.length==1) ? hiddenActivationFunction[0] : hiddenActivationFunction[i]));
                     inputLayer.setNextLayer(hiddenLayers.get(i));
                     hiddenLayers.get(i).setPreviousLayer(inputLayer);
                 } else {
@@ -58,23 +59,89 @@ public class NeuralNetwork {
     }
 
     public void calc() {
-        inputLayer.setInput(input);
+        inputLayer.setInputs(input);
         inputLayer.calc();
         for (int i = 0; i < numberOfHiddenLayers; i++) {
             HiddenLayer h1 = hiddenLayers.get(i);
-            h1.setInput(h1.getPreviousLayer().getOutput());
+            h1.setInputs(h1.getPreviousLayer().getOutputs());
             h1.calc();
         }
-        outputLayer.setInput(outputLayer.getPreviousLayer().getOutput());
+        outputLayer.setInputs(outputLayer.getPreviousLayer().getOutputs());
         outputLayer.calc();
-        this.output = outputLayer.getOutput();
+        output = outputLayer.getOutputs();
     }
 
-    public ArrayList<Double> getOutput() {
-        return output;
+
+    public InputLayer getInputLayer() {
+        return new InputLayer(inputLayer);
+    }
+
+    public void setInputLayer(InputLayer inputLayer) {
+        this.inputLayer = new InputLayer(inputLayer);
+    }
+
+    public ArrayList<HiddenLayer> getHiddenLayers() {
+        ArrayList<HiddenLayer> returnList = new ArrayList<>(hiddenLayers.size());
+        for(HiddenLayer h:hiddenLayers)
+            returnList.add(new HiddenLayer(h));
+        return returnList;
+    }
+
+    public void setHiddenLayers(ArrayList<HiddenLayer> hiddenLayers) {
+        this.hiddenLayers = new ArrayList<>(hiddenLayers.size());
+        for(HiddenLayer h:hiddenLayers)
+            this.hiddenLayers.add(new HiddenLayer(h));
+    }
+
+    public OutputLayer getOutputLayer() {
+        return new OutputLayer(outputLayer);
+    }
+
+    public void setOutputLayer(OutputLayer outputLayer) {
+        this.outputLayer = new OutputLayer(outputLayer);
+    }
+
+    public int getNumberOfHiddenLayers() {
+        return numberOfHiddenLayers;
+    }
+
+    public void setNumberOfHiddenLayers(int numberOfHiddenLayers) {
+        this.numberOfHiddenLayers = numberOfHiddenLayers;
+    }
+
+    public int getNumberOfInputs() {
+        return numberOfInputs;
+    }
+
+    public void setNumberOfInputs(int numberOfInputs) {
+        this.numberOfInputs = numberOfInputs;
+    }
+
+    public int getNumberOfOutputs() {
+        return numberOfOutputs;
+    }
+
+    public void setNumberOfOutputs(int numberOfOutputs) {
+        this.numberOfOutputs = numberOfOutputs;
+    }
+
+    public ArrayList<Double> getInput() {
+        return new ArrayList<>(input);
     }
 
     public void setInput(ArrayList<Double> input) {
-        this.input = input;
+        this.input = new ArrayList<>(input);
+    }
+
+    public ArrayList<Double> getOutput() {
+        return new ArrayList<>(output);
+    }
+
+    public void setOutput(ArrayList<Double> output) {
+        this.output = new ArrayList<>(output);
+    }
+
+    public HiddenLayer getHiddenLayers(int layer) {
+        return new HiddenLayer(hiddenLayers.get(layer));
     }
 }
