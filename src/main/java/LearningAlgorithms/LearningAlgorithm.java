@@ -6,13 +6,13 @@ import NeuralNetworkPackage.NeuralNetwork;
 import java.util.ArrayList;
 
 public abstract class LearningAlgorithm {
-    protected NeuralNetwork neuralNetwork;//the one trained by this algorithm
+    protected NeuralNetwork neuralNetwork; //the one trained by this algorithm
     public enum LearningMode{ONLINE,BATCH};
     protected enum LearningParagigm {SUPERVISED,UNSUPERVISED};
-
-    protected final int MAXepoch=10000;
+    protected LearningMode learningMode;
+    protected final int MAXEpoch =10000;
     protected int epoch=0;
-    protected double MinOverallError=0.001;//Error causing neural network to stop learning
+    protected double MinOverallError=0.001; //Error causing neural network to stop learning
     protected double LearningRate=0.1;
     protected NeuralDataSet trainingDataSet;
     protected NeuralDataSet testingDataSet;

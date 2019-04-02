@@ -3,7 +3,6 @@ package NeuralNetworkPackage;
 import ActivationFunctions.IActivationFunction;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class NeuralNetwork {
     private InputLayer inputLayer;
@@ -12,8 +11,8 @@ public class NeuralNetwork {
     private int numberOfHiddenLayers;
     private int numberOfInputs;
     private int numberOfOutputs;
-    private ArrayList<Double> input;
-    private ArrayList<Double> output;
+    private ArrayList<Double> inputs;
+    private ArrayList<Double> outputs;
 
     public NeuralNetwork(int numberOfInputs, int numberOfHiddenLayers, int[] numberOfNeuronsInHiddenLayers,
                          IActivationFunction[] hiddenActivationFunction, int numberOfOutputs,
@@ -23,7 +22,7 @@ public class NeuralNetwork {
         this.numberOfHiddenLayers = numberOfHiddenLayers;
         this.numberOfOutputs = numberOfOutputs;
 
-        this.input = new ArrayList<>(numberOfInputs);
+        this.inputs = new ArrayList<>(numberOfInputs);
         this.inputLayer = new InputLayer(numberOfInputs);
 
         if (numberOfHiddenLayers > 0) {
@@ -55,11 +54,11 @@ public class NeuralNetwork {
             outputLayer.setPreviousLayer(inputLayer);
         }
 
-        output = new ArrayList<>(numberOfOutputs);
+        outputs = new ArrayList<>(numberOfOutputs);
     }
 
     public void calc() {
-        inputLayer.setInputs(input);
+        inputLayer.setInputs(inputs);
         inputLayer.calc();
         for (int i = 0; i < numberOfHiddenLayers; i++) {
             HiddenLayer h1 = hiddenLayers.get(i);
@@ -68,7 +67,7 @@ public class NeuralNetwork {
         }
         outputLayer.setInputs(outputLayer.getPreviousLayer().getOutputs());
         outputLayer.calc();
-        output = outputLayer.getOutputs();
+        outputs = outputLayer.getOutputs();
     }
 
 
@@ -125,23 +124,28 @@ public class NeuralNetwork {
         this.numberOfOutputs = numberOfOutputs;
     }
 
-    public ArrayList<Double> getInput() {
-        return new ArrayList<>(input);
+    public ArrayList<Double> getInputs() {
+        return new ArrayList<>(inputs);
     }
 
-    public void setInput(ArrayList<Double> input) {
-        this.input = new ArrayList<>(input);
+    public Double getInput(int i) {
+        return inputs.get(i);
     }
 
-    public ArrayList<Double> getOutput() {
-        return new ArrayList<>(output);
+    public void setInputs(ArrayList<Double> inputs) {
+        this.inputs = new ArrayList<>(inputs);
     }
 
-    public void setOutput(ArrayList<Double> output) {
-        this.output = new ArrayList<>(output);
+    public ArrayList<Double> getOutputs() {
+        return new ArrayList<>(outputs);
     }
 
-    public HiddenLayer getHiddenLayers(int layer) {
-        return new HiddenLayer(hiddenLayers.get(layer));
+    public void setOutputs(ArrayList<Double> outputs) {
+        this.outputs = new ArrayList<>(outputs);
+    }
+
+    public HiddenLayer getHiddenLayer(int i) {
+        if(i>=numberOfHiddenLayers) throw new IndexOutOfBoundsException("Illegal argument");
+        return new HiddenLayer(hiddenLayers.get(i));
     }
 }

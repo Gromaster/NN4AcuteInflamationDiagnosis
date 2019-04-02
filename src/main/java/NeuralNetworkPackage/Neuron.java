@@ -59,6 +59,10 @@ public class Neuron {
         output=activationFunction.calc(outputBeforeActivation);
     }
 
+
+
+
+
     public double getWeight(int i){
         return weights.get(i);
     }

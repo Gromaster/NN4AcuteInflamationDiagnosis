@@ -69,7 +69,10 @@ public class NeuralDataSet {
     }
 
     public ArrayList<ArrayList<Double>> getArrayInputData() {
-        return patientData;
+        ArrayList<ArrayList<Double>> returnList=new ArrayList<>(patientData.size());
+        for(ArrayList<Double> singleRecord:patientData)
+            returnList.add(new ArrayList<>(singleRecord));
+        return returnList;
     }
 
 
@@ -80,6 +83,11 @@ public class NeuralDataSet {
      private void setNumberOfRecords(int numberOfRecords) {
          this.numberOfRecords = numberOfRecords;
      }
+
+    public ArrayList<Double> getIthInputArrayList(int i) {
+        return new ArrayList<>(this.patientData.get(i));
+    }
+
     class DataReadingException extends RuntimeException{
         DataReadingException(String s){
             super(s);
