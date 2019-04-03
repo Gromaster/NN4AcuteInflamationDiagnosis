@@ -142,7 +142,7 @@ public class Backpropagation extends LearningAlgorithm {
 
 
     @Override
-    public void train() throws NeuralException {
+    public void train(){
         epoch=0;
         int k=0;
         currentRecord=0;
@@ -169,33 +169,33 @@ public class Backpropagation extends LearningAlgorithm {
     }
 
     @Override
-    public void forward() throws NeuralException {
-        for(int i=0;i<trainingDataSet.numberOfRecords;i++){
+    public void forward(){
+        for(int i=0;i<trainingDataSet.getNumberOfRecords();i++){
             neuralNetwork.setInputs(trainingDataSet.getInputRecord(i));
             neuralNetwork.calc();
             trainingDataSet.setNeuralOutput(i, neuralNetwork.getOutputs());
-            generalError.set(i, generalError(trainingDataSet.getArrayTargetOutputRecord(i),trainingDataSet.getArrayNeuralOutputRecord(i)));
+            generalError.set(i, generalError(trainingDataSet.getExpectedOutputRecord(i),trainingDataSet.getNeuralOutputRecord(i)));
             for(int j=0;j<neuralNetwork.getNumberOfOutputs();j++){
-                error.get(i).set(j,simpleError(trainingDataSet.getArrayTargetOutputRecord(i).get(j), trainingDataSet.getArrayNeuralOutputRecord(i).get(j)));
+                error.get(i).set(j, simpleError(trainingDataSet.getExpectedOutputRecord(i).get(j), trainingDataSet.getNeuralOutputRecord(i).get(j)));
             }
         }
         for(int j=0;j<neuralNetwork.getNumberOfOutputs();j++){
-            overallError.set(j, overallError(trainingDataSet.getIthTargetOutputArrayList(j), trainingDataSet.getIthNeuralOutputArrayList(j)));
+            overallError.set(j, overallError(trainingDataSet.getIthExpectedOutput(j), trainingDataSet.getIthNeuralOutput(j)));
         }
-        overallGeneralError=overallGeneralErrorArrayList(trainingDataSet.getArrayTargetOutputData(),trainingDataSet.getArrayNeuralOutputData());
+        overallGeneralError=overallGeneralError(trainingDataSet.getExpectedOutputData(),trainingDataSet.getNeuralOutputData());
     }
 
     @Override
-    public void forward(int i) throws NeuralException {
+    public void forward(int i){
         neuralNetwork.setInputs(trainingDataSet.getInputRecord(i));
         neuralNetwork.calc();
         trainingDataSet.setNeuralOutput(i, neuralNetwork.getOutputs());
-        generalError.set(i,generalError(trainingDataSet.getArrayTargetOutputRecord(),trainingDataSet.getArrayNeuralOutputRecord()));
+        generalError.set(i,generalError(trainingDataSet.getExpectedOutputRecord(i),trainingDataSet.getNeuralOutputRecord(i)));
         for(int j=0;j<neuralNetwork.getNumberOfOutputs();j++){
-            overallError.set(j,overallError(trainingDataSet.getIthTargetOutputArrayList(j), trainingDataSet.getArrayNeuralOutputRecord(i)));
-            error.get(i).set(j,simpleError(trainingDataSet.getIthTargetOutputArrayList(j).get(i), trainingDataSet.getIthNeuralOutputArrayList(j).get(i)));
+            overallError.set(j,overallError(trainingDataSet.getIthExpectedOutput(j), trainingDataSet.getNeuralOutputRecord(i)));
+            error.get(i).set(j,simpleError(trainingDataSet.getIthExpectedOutput(j).get(i), trainingDataSet.getIthNeuralOutput(j).get(i)));
         }
-        overallGeneralError=overallGeneralErrorArrayList(trainingDataSet.getArrayTargetOutputData(),trainingDataSet.getArrayNeuralOutputData());
+        overallGeneralError=overallGeneralError(trainingDataSet.getExpectedOutputData(),trainingDataSet.getNeuralOutputData());
 
     }
 
@@ -252,9 +252,57 @@ public class Backpropagation extends LearningAlgorithm {
     }
 
     @Override
-    public Double calcNewWeight(int layer, int input, int neuron, double error) throws NeuralException {
+    public Double calcNewWeight(int layer, int input, int neuron, double error){
         return null;
     }
+
+    private Double generalError(ArrayList<Double> outputExpected,ArrayList<Double> neuralOutput){
+        int size=outputExpected.size();
+        Double result=0.0;
+        for(int i=0;i<size;i++){
+            result+=Math.pow(outputExpected.get(i)-neuralOutput.get(i),degreeGeneralError);
+        }
+        if(generalErrorMeasurement==ErrorMeasurement.MSE)
+            result*=(1.0/size);
+        else
+            result*=(1.0/degreeGeneralError);
+        return result;
+    }
+
+    private Double overallError(ArrayList<Double> outputExpected,ArrayList<Double> neuralOutput){
+        int size=outputExpected.size();
+        Double result=0.0;
+        for(int i=0;i<size;i++)
+            result+=Math.pow(outputExpected.get(i)-neuralOutput.get(i),degreeOverallError);
+        if(overallErrorMeasurement==ErrorMeasurement.MSE)
+            result*=(1.0/size);
+        else
+            result*=(1.0/degreeOverallError);
+        return result;
+    }
+
+    private Double simpleError(Double outputExpected,Double neuralOutput){ return outputExpected-neuralOutput;}
+
+    private Double squareError(Double outputExpected,Double neuralOutput){ return Math.pow(outputExpected-neuralOutput,2.0);}
+
+    private Double overallGeneralError(ArrayList<ArrayList<Double>> expectedOutput,ArrayList<ArrayList<Double>> neuralOutput) {
+        int N=expectedOutput.size();
+        int M=expectedOutput.get(0).size();
+        Double result=0.0;
+        for(int i=0;i<N;i++){
+            Double partialResult = 0.0;
+            for(int j=0;j<M;j++){
+                partialResult+=Math.pow(expectedOutput.get(i).get(j)-neuralOutput.get(i).get(j),degreeGeneralError);
+            }
+            if(generalErrorMeasurement==ErrorMeasurement.MSE)
+                result+=Math.pow((1.0/M)*partialResult,degreeOverallError);
+            else
+                result+=Math.pow((1.0/degreeGeneralError)*partialResult,degreeOverallError);
+        }
+        return (1.0/N)*result;
+    }
+
+
 
 
 }

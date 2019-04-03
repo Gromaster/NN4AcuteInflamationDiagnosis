@@ -4,13 +4,16 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class NeuralDataSet {
     private ArrayList<ArrayList<Double>> patientData;
     private ArrayList<ArrayList<Double>> patientDiagnoses;
+    private ArrayList<ArrayList<Double>> neuralOutput;
     private int numberOfRecords=0;
     private int numberOfDiagnoses=0;
     private int numberOfParameters=0;
+
 
     NeuralDataSet(String filePath) {
         dataAcquisition(filePath);
@@ -86,6 +89,52 @@ public class NeuralDataSet {
 
     public ArrayList<Double> getIthInputArrayList(int i) {
         return new ArrayList<>(this.patientData.get(i));
+    }
+
+    public ArrayList<Double> getInputRecord(int i) {
+        return new ArrayList<>(patientData.get(i));
+    }
+
+    public void setNeuralOutput(int i, ArrayList<Double> outputs) {
+        if(this.neuralOutput==null || outputs.size()!=getNumberOfRecords())
+            this.neuralOutput=new ArrayList<>(getNumberOfRecords());
+        this.neuralOutput.set(i, new ArrayList<>(outputs));
+    }
+
+    public ArrayList<ArrayList<Double>> getExpectedOutputData() {
+        ArrayList<ArrayList<Double>> result=new ArrayList<>(getNumberOfRecords());
+        for(ArrayList<Double> array:patientDiagnoses)
+            result.add(new ArrayList<>(array));
+        return result;
+    }
+
+    public ArrayList<Double> getIthExpectedOutput(int i) {//return specified Ith column of expected output
+        ArrayList<Double> result=new ArrayList<>(getNumberOfRecords());
+        for(ArrayList<Double> array: patientDiagnoses)
+            result.add(array.get(i));
+        return result;
+    }
+
+    public ArrayList<Double> getExpectedOutputRecord(int i) {
+        return new ArrayList<>(patientDiagnoses.get(i));
+    }
+
+    public ArrayList<Double> getNeuralOutputRecord(int i) {
+        return new ArrayList<>(neuralOutput.get(i));
+    }
+
+    public ArrayList<Double> getIthNeuralOutput(int i) {
+        ArrayList<Double> result=new ArrayList<>(getNumberOfRecords());
+        for(ArrayList<Double> array:neuralOutput)
+            result.add(array.get(i));
+        return result;
+    }
+
+    public ArrayList<ArrayList<Double>> getNeuralOutputData() {
+        ArrayList<ArrayList<Double>> result=new ArrayList<>(getNumberOfRecords());
+        for(ArrayList<Double> array:neuralOutput)
+            result.add(new ArrayList<>(array));
+        return result;
     }
 
     class DataReadingException extends RuntimeException{
