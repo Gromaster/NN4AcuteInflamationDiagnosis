@@ -2,5 +2,5 @@ package ActivationFunctions;
 
 public interface IActivationFunction {
     Double calc(Double outputBeforeActivation);
-    Double derivative();
+    Double derivative(Double outputBeforeActivation);
 }

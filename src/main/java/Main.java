@@ -1,6 +1,5 @@
 import ActivationFunctions.ActivationFunction;
 import ActivationFunctions.IActivationFunction;
-import ActivationFunctions.Sigmoid;
 import Data.NeuralDataSet;
 import NeuralNetworkPackage.NeuralNetwork;
 

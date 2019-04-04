@@ -15,7 +15,7 @@ public class NeuralDataSet {
     private int numberOfParameters=0;
 
 
-    NeuralDataSet(String filePath) {
+    public NeuralDataSet(String filePath) {
         dataAcquisition(filePath);
     }
 

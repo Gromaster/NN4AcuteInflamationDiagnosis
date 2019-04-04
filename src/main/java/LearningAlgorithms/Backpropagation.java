@@ -1,6 +1,7 @@
 package LearningAlgorithms;
 
 import Data.NeuralDataSet;
+import NeuralNetworkPackage.HiddenLayer;
 import NeuralNetworkPackage.NeuralLayer;
 import NeuralNetworkPackage.NeuralNetwork;
 import NeuralNetworkPackage.Neuron;
@@ -119,26 +120,24 @@ public class Backpropagation extends LearningAlgorithm {
             if(k==numberOfHiddenLayers){
                 numberOfNeuronsInLayer=neuralNetwork.getOutputLayer().getNumberOfNeuronsInLayer();
                 numberOfInputsInNeuron=neuralNetwork.getOutputLayer().getNumberOfInputs();
-                for(int j=0;j<numberOfNeuronsInLayer;j++){
-                    previousDeltaWeights.get(k).add(new ArrayList<>());
-                    for(int i=0;i<numberOfInputsInNeuron;i++)
-                        previousDeltaWeights.get(k).get(j).add(0.0);
-                }
+                initializePreviousWeights(k, numberOfNeuronsInLayer, numberOfInputsInNeuron);
 
             }
             else {
                 numberOfNeuronsInLayer = neuralNetwork.getHiddenLayer(k).getNumberOfNeuronsInLayer();
                 numberOfInputsInNeuron = neuralNetwork.getHiddenLayer(k).getNumberOfInputs();
-                for(int j=0;j<numberOfNeuronsInLayer;j++){
-                    previousDeltaWeights.get(k).add(new ArrayList<>());
-                    for(int i=0;i<numberOfInputsInNeuron;i++)
-                        previousDeltaWeights.get(k).get(j).add(0.0);
-                }
+                initializePreviousWeights(k, numberOfNeuronsInLayer, numberOfInputsInNeuron);
             }
         }
     }
 
-
+    private void initializePreviousWeights(int k, int numberOfNeuronsInLayer, int numberOfInputsInNeuron) {
+        for(int j=0;j<numberOfNeuronsInLayer;j++){
+            previousDeltaWeights.get(k).add(new ArrayList<>());
+            for(int i=0;i<numberOfInputsInNeuron;i++)
+                previousDeltaWeights.get(k).get(j).add(0.0);
+        }
+    }
 
 
     @Override
@@ -165,6 +164,31 @@ public class Backpropagation extends LearningAlgorithm {
                 k=0;
             }
             forward(k);
+        }
+    }
+
+    private void applyNewWeights(){
+        int numberOfHiddenLayers=neuralNetwork.getNumberOfHiddenLayers();
+        for(int k=0;k<=numberOfHiddenLayers;k++){
+            int numberOfNeuronsInLayer,numberOfInputsInNeuron;
+            if(k<numberOfHiddenLayers){
+                HiddenLayer hiddenLayer=neuralNetwork.getHiddenLayer(k);
+                numberOfNeuronsInLayer=hiddenLayer.getNumberOfNeuronsInLayer();
+                numberOfInputsInNeuron=hiddenLayer.getNumberOfInputs();
+                for(int j=0;j<numberOfNeuronsInLayer;j++){
+                    for(int i=0;i<numberOfInputsInNeuron;i++){
+                        Double previousDeltaWeight=this.previousDeltaWeights.get(k).get(j).get(i);
+                        double momentum=MomentumRate*previousDeltaWeight;
+                        double newWeight=this.newWeights.get(k).get(j).get(i)-momentum;
+                        this.newWeights.get(k).get(j).set(i,newWeight);
+                        Neuron n=hiddenLayer.getNeuron(j);
+                        double deltaWeight = (newWeight-hiddenLayer.getNeuron(j).getWeight(i));
+                        previousDeltaWeights.get(k).get(j).set(i,deltaWeight);
+                        hiddenLayer.getNeuron(j).setWeight(i,newWeight);
+                    }
+                }
+                neuralNetwork.setHiddenLayer(k,hiddenLayer);
+            }
         }
     }
 
@@ -226,7 +250,7 @@ public class Backpropagation extends LearningAlgorithm {
         if(layer==neuralNetwork.getNumberOfHiddenLayers()){
             currLayer=neuralNetwork.getOutputLayer();
             currNeuron=currLayer.getNeuron(neuron);
-            currDeltaNeuron=error.get(neuron)*currNeuron.derivative(currLayer.getInputs());
+            currDeltaNeuron=error.get(currentRecord).get(neuron)*currNeuron.derivative(currLayer.getInputs());
         }
         else {
             currLayer=neuralNetwork.getHiddenLayer(layer);

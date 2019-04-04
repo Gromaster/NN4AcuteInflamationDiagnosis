@@ -133,6 +133,6 @@ public abstract class NeuralLayer {
 
 
     public Neuron getNeuron(int i) {
-        return new Neuron(neurons.get(i));
+        return neurons.get(i);
     }
 }

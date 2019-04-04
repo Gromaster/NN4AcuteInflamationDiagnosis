@@ -35,7 +35,7 @@ public class Neuron {
         init();
     }
 
-     void init(){
+    void init(){
         Random r=new Random();
         for(int i=0;i<numberOfInputs+1;i++){
             try{
@@ -47,7 +47,8 @@ public class Neuron {
             }
         }
     }
-     void calc(){
+
+    void calc(){
         outputBeforeActivation=0.0;
         if(numberOfInputs>0) {
             if (inputs != null && weights != null) {
@@ -59,7 +60,17 @@ public class Neuron {
         output=activationFunction.calc(outputBeforeActivation);
     }
 
-
+    public Double derivative(ArrayList<Double> input){
+        Double outputBeforeActivation=0.0;
+        if(numberOfInputs>0){
+            if(weights!=null){
+                for(int i=0;i<=numberOfInputs;i++){
+                    outputBeforeActivation+=(i==numberOfInputs?bias:input.get(i))*weights.get(i);
+                }
+            }
+        }
+        return activationFunction.derivative(outputBeforeActivation);
+    }
 
 
 
@@ -129,5 +140,9 @@ public class Neuron {
 
     public Double getInput(int i) {
         return inputs.get(i);
+    }
+
+    public void setWeight(int i, double newWeight) {
+        this.weights.set(i,newWeight);
     }
 }

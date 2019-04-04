@@ -148,4 +148,8 @@ public class NeuralNetwork {
         if(i>=numberOfHiddenLayers) throw new IndexOutOfBoundsException("Illegal argument");
         return new HiddenLayer(hiddenLayers.get(i));
     }
+
+    public void setHiddenLayer(int k, HiddenLayer hiddenLayer) {
+        this.hiddenLayers.set(k,new HiddenLayer(hiddenLayer));
+    }
 }
